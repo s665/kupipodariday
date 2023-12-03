@@ -10,6 +10,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmConfigService } from './config/TypeOrmConfigService';
 import { WinstonModule } from 'nest-winston';
 import { WinstonConfigService } from './config/WinstonConfigService';
+import { User } from './users/entities/user.entity';
+import { Wish } from './wishes/entities/wish.entity';
+import { Wishlist } from './wishlist/entities/wishlist.entity';
+import { Offer } from './offers/entities/offer.entity';
 
 @Module({
   imports: [
@@ -23,6 +27,7 @@ import { WinstonConfigService } from './config/WinstonConfigService';
       inject: [ConfigService],
       useClass: TypeOrmConfigService,
     }),
+    TypeOrmModule.forFeature([User, Wish, Wishlist, Offer]),
     UsersModule,
     WishesModule,
     WishlistModule,
