@@ -19,8 +19,12 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOne(username: string): Promise<User> {
+  async findOneByName(username: string): Promise<User> {
     return await this.userRepository.findOneBy({ username });
+  }
+
+  async findOneById(id: number): Promise<User> {
+    return await this.userRepository.findOneBy({ id });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
