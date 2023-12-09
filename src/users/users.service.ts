@@ -1,18 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HashService } from '../hash/hash.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly hashService: HashService,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const hashPassword = await this.hashService.hash(createUserDto.password);
+      return await this.userRepository.save({
+        ...createUserDto,
+        password: hashPassword,
+      });
+    } catch (e) {
+      if (e instanceof QueryFailedError) {
+        throw new ConflictException({
+          errorMessage: 'Пользователь с таким email уже существует',
+        });
+      }
+    }
   }
 
   findAll() {

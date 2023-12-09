@@ -15,6 +15,7 @@ import { Offer } from './offers/entities/offer.entity';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmConfigService } from './config/type-orm-config.service';
 import { WinstonConfigService } from './config/winston-config.service';
+import { HashModule } from './hash/hash.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { WinstonConfigService } from './config/winston-config.service';
     WishlistModule,
     OffersModule,
     AuthModule,
+    HashModule,
   ],
   controllers: [AppController],
   providers: [AppService],
