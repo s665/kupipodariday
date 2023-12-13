@@ -16,12 +16,12 @@ export class AuthController {
   @Public()
   @Post('signin')
   async signin(@Request() req) {
-    return this.authService.login(req.user);
+    return this.authService.auth(req.user);
   }
 
   @Public()
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return await this.usersService.create(createUserDto);
   }
 }

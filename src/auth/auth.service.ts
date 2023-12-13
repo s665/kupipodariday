@@ -16,7 +16,7 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<Omit<User, 'password'>> {
-    const user = await this.usersService.findOneByName(username);
+    const user = await this.usersService.findOne({ username });
 
     const verifyPassword = await this.hashService.verify(
       password,
@@ -30,7 +30,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: User) {
+  async auth(user: User) {
     const payload = { sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
