@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,19 +18,50 @@ export class WishesService {
     });
   }
 
-  findAll() {
-    return `This action returns all wishes`;
+  async findLast() {
+    return await this.wishRepository.find({
+      relations: ['owner', 'offers'],
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 40,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wish`;
+  async findTop() {
+    return await this.wishRepository.find({
+      relations: ['owner', 'offers'],
+      order: {
+        copied: 'DESC',
+      },
+      take: 10,
+    });
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
+  async findOne(id: number) {
+    return await this.wishRepository.findOne({
+      where: { id },
+      relations: ['owner', 'offers'],
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wish`;
+  async update(id: number, updateWishDto: UpdateWishDto, userId: number) {
+    const wish = await this.findOne(id);
+    if (userId !== wish.owner.id) {
+      throw new ForbiddenException();
+    }
+    await this.wishRepository.update(id, updateWishDto);
+  }
+
+  async remove(id: number, userId: number) {
+    const wish = await this.findOne(id);
+    if (userId !== wish.owner.id) {
+      throw new ForbiddenException();
+    }
+    const result = await this.wishRepository.delete(id);
+
+    if (result.affected === 1) {
+      return wish;
+    }
   }
 }
