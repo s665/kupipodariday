@@ -6,20 +6,20 @@ import {
   Param,
   Patch,
   Post,
-  Req,
 } from '@nestjs/common';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
-import { Public } from '../auth/decorators/public';
+import { Public } from '../auth/decorators/public-decorator';
+import { ReqUser } from '../auth/decorators/request-user.decorator';
 
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
   @Post()
-  create(@Req() req, @Body() createWishDto: CreateWishDto) {
-    return this.wishesService.create(req.user.id, createWishDto);
+  create(@ReqUser() id, @Body() createWishDto: CreateWishDto) {
+    return this.wishesService.create(id, createWishDto);
   }
 
   @Public()
@@ -41,15 +41,15 @@ export class WishesController {
 
   @Patch(':id')
   update(
-    @Req() req,
+    @ReqUser() userId,
     @Param('id') id: string,
     @Body() updateWishDto: UpdateWishDto,
   ) {
-    return this.wishesService.update(+id, updateWishDto, req.user.id);
+    return this.wishesService.update(+id, updateWishDto, userId);
   }
 
   @Delete(':id')
-  remove(@Req() req, @Param('id') id: string) {
-    return this.wishesService.remove(+id, req.user.id);
+  remove(@ReqUser() userId, @Param('id') id: string) {
+    return this.wishesService.remove(+id, userId);
   }
 }
