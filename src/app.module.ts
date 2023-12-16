@@ -16,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmConfigService } from './config/type-orm-config.service';
 import { WinstonConfigService } from './config/winston-config.service';
 import { HashModule } from './hash/hash.module';
+import { APP_FILTER } from '@nestjs/core';
+import { TypeormExceptionFilter } from './filters/typeorm-exception.filter';
 
 @Module({
   imports: [
@@ -38,6 +40,9 @@ import { HashModule } from './hash/hash.module';
     HashModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: TypeormExceptionFilter },
+  ],
 })
 export class AppModule {}

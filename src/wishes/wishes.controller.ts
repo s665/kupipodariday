@@ -35,8 +35,8 @@ export class WishesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wishesService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.wishesService.findOne(id);
   }
 
   @Patch(':id')
@@ -45,11 +45,16 @@ export class WishesController {
     @Param('id') id: string,
     @Body() updateWishDto: UpdateWishDto,
   ) {
-    return this.wishesService.update(+id, updateWishDto, userId);
+    return this.wishesService.updateOne(+id, updateWishDto, userId);
   }
 
   @Delete(':id')
-  remove(@ReqUser() userId, @Param('id') id: string) {
-    return this.wishesService.remove(+id, userId);
+  remove(@ReqUser() userId, @Param('id') id: number) {
+    return this.wishesService.removeOne(id, userId);
+  }
+
+  @Post(':id/copy')
+  copyWish(@ReqUser() userId, @Param('id') id: number) {
+    return this.wishesService.copy(id, userId);
   }
 }

@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,15 +16,20 @@ export class WishesService {
     private readonly wishRepository: Repository<Wish>,
   ) {}
   async create(userId: number, createWishDto: CreateWishDto) {
-    await this.wishRepository.save({
+    const wish = await this.wishRepository.create({
       ...createWishDto,
       owner: { id: userId },
     });
+
+    return await this.wishRepository.save(wish);
   }
 
   async findLast() {
     return await this.wishRepository.find({
-      relations: ['owner', 'offers'],
+      relations: {
+        owner: true,
+        offers: true,
+      },
       order: {
         createdAt: 'DESC',
       },
@@ -39,13 +48,16 @@ export class WishesService {
   }
 
   async findOne(id: number) {
-    return await this.wishRepository.findOne({
+    return await this.wishRepository.findOneOrFail({
       where: { id },
-      relations: ['owner', 'offers'],
+      relations: {
+        owner: true,
+        offers: true,
+      },
     });
   }
 
-  async update(id: number, updateWishDto: UpdateWishDto, userId: number) {
+  async updateOne(id: number, updateWishDto: UpdateWishDto, userId: number) {
     const wish = await this.findOne(id);
     if (userId !== wish.owner.id) {
       throw new ForbiddenException();
@@ -53,7 +65,7 @@ export class WishesService {
     await this.wishRepository.update(id, updateWishDto);
   }
 
-  async remove(id: number, userId: number) {
+  async removeOne(id: number, userId: number) {
     const wish = await this.findOne(id);
     if (userId !== wish.owner.id) {
       throw new ForbiddenException();
@@ -63,5 +75,25 @@ export class WishesService {
     if (result.affected === 1) {
       return wish;
     }
+  }
+
+  async copy(id: number, userId: number) {
+    const myWish = await this.wishRepository.findOneBy({
+      id,
+      owner: { id: userId },
+    });
+    if (myWish) {
+      throw new ConflictException('Нельзя копировать свои подарки');
+    }
+    const wish = await this.wishRepository.findOneByOrFail({
+      id,
+    });
+    const newWish = await this.wishRepository.save({
+      ...wish,
+      owner: { id: userId },
+    });
+    await this.wishRepository.save({ ...wish, copied: wish.copied + 1 });
+
+    return newWish;
   }
 }
