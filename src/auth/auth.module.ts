@@ -10,7 +10,6 @@ import { JwtConfigService } from '../config/jwt-config-service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { HashService } from '../hash/hash.service';
 import { HashModule } from '../hash/hash.module';
 
 @Module({

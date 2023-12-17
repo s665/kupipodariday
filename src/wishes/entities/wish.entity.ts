@@ -1,7 +1,7 @@
-import { Column, Entity, IsNull, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../base.entity/base.entity';
 import { User } from '../../users/entities/user.entity';
-import { IsNumber, IsOptional, IsUrl, Length } from 'class-validator';
+import { IsNumber, IsUrl, Length } from 'class-validator';
 import { Offer } from '../../offers/entities/offer.entity';
 
 @Entity()
