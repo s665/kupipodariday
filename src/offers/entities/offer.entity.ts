@@ -18,5 +18,5 @@ export class Offer extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
-  items: Wish;
+  item: Wish;
 }

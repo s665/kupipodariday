@@ -88,8 +88,13 @@ export class WishesService {
     const wish = await this.wishRepository.findOneByOrFail({
       id,
     });
+
     const newWish = await this.wishRepository.save({
-      ...wish,
+      name: wish.name,
+      price: wish.price,
+      description: wish.description,
+      image: wish.image,
+      link: wish.link,
       owner: { id: userId },
     });
     await this.wishRepository.save({ ...wish, copied: wish.copied + 1 });
