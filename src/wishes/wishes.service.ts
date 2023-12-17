@@ -62,6 +62,11 @@ export class WishesService {
     if (userId !== wish.owner.id) {
       throw new ForbiddenException();
     }
+    if (updateWishDto.price && wish.raised > 0) {
+      throw new ForbiddenException(
+        'Вы не можете изменять стоимость подарка, если уже есть желающие скинуться',
+      );
+    }
     await this.wishRepository.update(id, updateWishDto);
   }
 

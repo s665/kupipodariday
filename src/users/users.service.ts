@@ -38,7 +38,14 @@ export class UsersService {
         updateUserDto.password,
       );
     }
-    await this.userRepository.update(id, updateUserDto);
+    try {
+      await this.userRepository.update(id, updateUserDto);
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.code === '23505') {
+        throw new ConflictException('Такой пользователь уже существует');
+      }
+    }
+
     return this.findOne({ id });
   }
 
